@@ -14,16 +14,16 @@ def common_name(site):
 	elif 'pwd7' in site:
 		return "Password7"
 	else:
-		return "???"
+		return site
 
 # Number of credentials scraped total (non-unique)
 def total_results(rset, writeout=True):
 	ret_dict = defaultdict(int)
 	for result in rset:
-		ret_dict[result.split('/')[1].split('_')[0]] += len(rset[result])
+		ret_dict[common_name(result)] += len(rset[result])
 	if writeout:
 		for ret in sorted(ret_dict.items()):
-			print '{0: <17} {1}'.format(common_name(ret[0]), ret[1])
+			print '{0: <17} {1}'.format(ret[0], ret[1])
 		print "{0: <17} {1}".format("TOTAL:", sum(ret_dict.values()))
 	return ret_dict
 
@@ -33,14 +33,14 @@ def total_site_results_nodup(rset, writeout=True):
 	for result in rset:
 		for site in rset[result]:
 			try:
-				ret_dict[result.split('/')[1].split('_')[0]]\
+				ret_dict[common_name(result)]\
 				.add((site[0], site[1], site[2]))
 			# improper data
 			except IndexError, e:
 				pass
 	if writeout:
 		for ret in sorted(ret_dict.items()):
-			print '{0: <17} {1}'.format(common_name(ret[0]), len(ret[1]))
+			print '{0: <17} {1}'.format(ret[0], len(ret[1]))
 		print "{0: <17} {1}".format("TOTAL:", \
 			sum([len(s) for s in ret_dict.values()]))
 	return ret_dict
@@ -79,8 +79,7 @@ def alexa_results_by_site(rset, writeout=True):
 	for result in rset:
 		for site in rset[result]:
 			if site[0]:
-				ret_dict[result.split('/')[1].split('_')[0]]\
-				.add(site[0])
+				ret_dict[common_name(result)].add(site[0])
 	if writeout:
 		total_sites = set()
 		for ret in sorted(ret_dict.items()):
@@ -92,7 +91,7 @@ def alexa_results_by_site(rset, writeout=True):
 # Account credentials with some form of Englush profanity
 def profane_accounts(rset, writeout=True, profanities=['fuck', 'shit', \
 	'damn', 'bitch', 'crap', 'piss', 'dick', 'cock', 'pussy', 'asshole',\
-	'fag', 'bastard', 'bastard']):
+	'fag', 'bastard', 'slut']):
 	prof_user, prof_pass = 0, 0
 	reduce_sites = total_unique_results(rset, writeout=False)
 	#with open("bad-words.txt") as f:
@@ -133,7 +132,7 @@ def _delta(rlist, writeout, site):
 			except IndexError, e:
 				pass
 			print fmt_string.format(sdate, edate,\
-				 len(end_r ^ start_r))
+				 len(end_r - start_r))
 
 # Change in new credentials over time
 def change_over_time(rset, writeout=True):

@@ -3,7 +3,6 @@ import argparse
 import netsec_metrics as metrics
 from collections import defaultdict
 
-# easy arg parser
 def parse_args():
 	parser = argparse.ArgumentParser(description=\
 		'NetSec project data results parser.')
@@ -24,16 +23,14 @@ def result_files(directory, site):
 
 def main(directory, site):
 	totals = []
-	webset = set()
+	rsets = defaultdict(list)
 	files = result_files(directory, site)
 	for f in files:
 		with open(f, 'r') as f2:
-			site = f.split('_')[0]
 			for line in f2:
 				if line.strip():
 					data = line.split(',')
 					rsets[f].append([item.strip() for item in data])
-
 	print "##### Total per site #####"
 	metrics.total_results(rsets)
 	print "##### Total unique results per site #####"
@@ -45,10 +42,9 @@ def main(directory, site):
 	print "##### Alexa results by site #####"
 	metrics.alexa_results_by_site(rsets)
 	print "##### Accounts with profanity #####"
-	metrics.profane_accounts(rsets, profanities=['fuck'])
-	print "##### Change over time, by site #####"
+	metrics.profane_accounts(rsets)
+	print "##### Change over time #####"
 	metrics.change_over_time(rsets)
-
 	"""
 	bmn_set = rsets[3][1].difference(rsets[2][1])
 	print "bmn change:", len(bmn_set)
