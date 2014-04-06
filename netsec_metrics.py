@@ -110,7 +110,7 @@ def profane_accounts(rset, writeout=True, profanities=['fuck', 'shit', \
 			except IndexError, e:
 				pass
 	print '{0: <17} {1}'.format("Usernames:", prof_user)
-	print '{0: <17} {1}'.format("Passwords:", prof_user)
+	print '{0: <17} {1}'.format("Passwords:", prof_pass)
 	return (prof_user, prof_pass)
 
 # Helper function to change_over_time (IN PROGRESS)
@@ -121,13 +121,17 @@ def _delta(rlist, writeout, site):
 	for i in range(0, len(rlist) - 1): # avoid index error
 		sdate = rlist[i][0].split('_')[2]
 		edate = rlist[i+1][0].split('_')[2]
+		start_r, end_r = set(), set()
 		if writeout:
-			start_r, end_r = set(), set()
 			try:
 				for j in rlist[i+1][1]:
-					end_r.add((j[0], j[1], j[2]))
+					rstr = j[:3]
+					if len(rstr) < 3: rstr.append("#None#")
+					end_r.add(",".join(rstr)[:-1])
 				for k in rlist[i][1]:
-					start_r.add((k[0], k[1], k[2]))
+					rstr = k[:3]
+					if len(rstr) < 3: rstr.append("#None#")
+					start_r.add(",".join(rstr)[:-1])
 			# improper data
 			except IndexError, e:
 				pass
