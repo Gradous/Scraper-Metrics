@@ -113,30 +113,31 @@ def profane_accounts(rset, writeout=True, profanities=['fuck', 'shit', \
 	print '{0: <17} {1}'.format("Passwords:", prof_pass)
 	return (prof_user, prof_pass)
 
-# Helper function to change_over_time (IN PROGRESS)
-def _delta(rlist, writeout, site):
-	if writeout:
-		print common_name(site) + ":"
+# Helper function to change_over_time (MAY BE ONLY 95% ACCURATE)
+def _delta_over_t(rlist, writeout, site):
+	ret_list = []
+	if writeout: print common_name(site)
 	fmt_string = "{0: <10} --> {1: <10} {2: >5}"
 	for i in range(0, len(rlist) - 1): # avoid index error
 		sdate = rlist[i][0].split('_')[2]
 		edate = rlist[i+1][0].split('_')[2]
 		start_r, end_r = set(), set()
+		try:
+			for j in rlist[i+1][1]:
+				rstr = j[:3]
+				if len(rstr) < 3: rstr.append("#None#")
+				end_r.add(",".join(rstr)[:-1])
+			for k in rlist[i][1]:
+				rstr = k[:3]
+				if len(rstr) < 3: rstr.append("#None#")
+				start_r.add(",".join(rstr)[:-1])
+		# improper data
+		except IndexError, e:
+			pass
 		if writeout:
-			try:
-				for j in rlist[i+1][1]:
-					rstr = j[:3]
-					if len(rstr) < 3: rstr.append("#None#")
-					end_r.add(",".join(rstr)[:-1])
-				for k in rlist[i][1]:
-					rstr = k[:3]
-					if len(rstr) < 3: rstr.append("#None#")
-					start_r.add(",".join(rstr)[:-1])
-			# improper data
-			except IndexError, e:
-				pass
-			print fmt_string.format(sdate, edate,\
-				 len(end_r - start_r))
+			print fmt_string.format(sdate, edate, len(end_r - start_r))
+		ret_list.append((sdate, edate, len(end_r - start_r)))
+	return ret_list
 
 # Change in new credentials over time
 def change_over_time(rset, writeout=True):
@@ -153,10 +154,42 @@ def change_over_time(rset, writeout=True):
 		elif 'pwd7' in result[0]:
 			pwd7.append((result[0], result[1]))
 
-	_delta(sorted(bmn), writeout, 'bmn')
-	_delta(sorted(fa), writeout, 'fakeaccount')
-	_delta(sorted(l2m), writeout, 'login2me')
-	_delta(sorted(lgz), writeout, 'loginz')
-	_delta(sorted(pwd7), writeout, 'pwd7')
+	_delta_over_t(sorted(bmn), writeout, 'bmn')
+	_delta_over_t(sorted(fa), writeout, 'fakeaccount')
+	_delta_over_t(sorted(l2m), writeout, 'login2me')
+	_delta_over_t(sorted(lgz), writeout, 'loginz')
+	_delta_over_t(sorted(pwd7), writeout, 'pwd7')
 
-	
+# Sites with most votes (BMN, FA, Pwd7 only)
+def most_voted_sites(rset, writeout=True, limit=10):
+	ret_dict = defaultdict(int)
+	perc_dict = defaultdict(int)
+	for result in rset.items():
+		if not "login2me" in result[0] and \
+		not "loginz" in result[0]:
+			for r in result[1]:
+				if "bmn" in result[0]:
+					vote_str = r[-2]
+				else:
+					vote_str = r[-1]
+				if "votes" in vote_str:
+					ret_dict[r[0]] += int(vote_str.split('votes')[0])
+					if "bmn" in result[0]:
+						perc_dict['bmn'] += int(vote_str.split('votes')[0])
+					elif "fakeaccount" in result[0]:
+						perc_dict['fakeaccount'] += \
+						int(vote_str.split('votes')[0])
+					elif "pwd7" in result[0]:
+						perc_dict['pwd7'] += int(vote_str.split('votes')[0])
+	if writeout:
+		print '{0: <17} {1}'.format("SITE", "RESULTS")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True)[:limit]:
+			print '{0: <17} {1}'.format(ret[0], ret[1])
+		print
+		for s in perc_dict.items():
+			print '{0: <16} {1: 0.2f}%'.format(common_name(s[0]),\
+			(float(s[1]) / sum(perc_dict.values())) * 100.0)
+		print "{0} votes total".format(sum(perc_dict.values()))
+		
+	return ret_dict

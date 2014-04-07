@@ -21,8 +21,8 @@ def result_files(directory, site):
 	else:
 		return sorted([z for z in files if site in z])
 
-def main(directory, site):
-	totals = []
+# Get data from the files
+def get_result_set(directory, site):
 	rsets = defaultdict(list)
 	files = result_files(directory, site)
 	for f in files:
@@ -31,6 +31,11 @@ def main(directory, site):
 				if line.strip():
 					data = line.split(',')
 					rsets[f].append([item.strip() for item in data])
+			f2.close()
+	return rsets
+
+def main(directory, site):
+	rsets = get_result_set(directory, site)
 	print "##### Total per site #####"
 	metrics.total_results(rsets)
 	print "##### Total unique results per site #####"
@@ -45,14 +50,8 @@ def main(directory, site):
 	metrics.profane_accounts(rsets)
 	print "##### Change over time #####"
 	metrics.change_over_time(rsets)
-	"""
-	bmn_set = rsets[3][1].difference(rsets[2][1])
-	print "bmn change:", len(bmn_set)
-
-	loginz_set = rsets[14][1].difference(rsets[15][1])
-	print "loginz change:", len(loginz_set)
-	"""
-
+	print "##### Most voted on sites #####"
+	metrics.most_voted_sites(rsets)
 if __name__ == '__main__':
 	args = parse_args()
 	main(args.directory, args.site)
