@@ -361,3 +361,142 @@ def site_most_popular_countries_accs(rset, cat_file, writeout=True):
 					print '{0},{1}'.format("No region", r[1])
 			print
 	return ret_dict
+
+# site's most popular countries, by # of accounts
+def site_most_popular_countries_sites(rset, cat_file, writeout=True):
+	ret_dict = defaultdict(Counter)
+	site_dict = _site_cat_dict(cat_file)
+	uniq_sites = defaultdict(set)
+	# get unique sites scraped
+	sav_dict = total_site_results_nodup(rset, writeout=False)[0]
+	# for each password site (key for dictionary)
+	for uniq_dict in sav_dict:
+		# for each result site for that site
+		for dict_site in sav_dict[uniq_dict]:
+			# add it to a set
+			uniq_sites[uniq_dict].add(dict_site[0])
+	# proceed to read sites
+	for pw_site in uniq_sites:
+		for site in uniq_sites[pw_site]:
+			# some sites have no region
+			if site_dict[site]:
+				# double layer dictionary
+				(ret_dict[pw_site])[site_dict[site].region] += 1
+	if writeout:
+		print '{0},{1}'.format("REGION", "# SITES")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True):
+			print ret[0]
+			for r in sorted(ret[1].items(), key=lambda y : y[1],\
+			 reverse=True):
+				if r[0]:
+					print '{0},{1}'.format(r[0], r[1])
+				else:
+					print '{0},{1}'.format("No region", r[1])
+			print
+	return ret_dict
+
+# overall most popular categories, by # of accounts for sites in the region
+def ov_most_popular_categories_sites(rset, cat_file, writeout=True):
+	ret_dict = defaultdict(int)
+	site_dict = _site_cat_dict(cat_file)
+	uniq_sites = set()
+	# get unique sites scraped
+	for site in total_unique_results(rset, writeout=False)[0]:
+		uniq_sites.add(site[0])
+	# then categorize
+	for uniq_site in uniq_sites:
+		# some sites have no region
+		if site_dict[uniq_site]:
+			ret_dict[ site_dict[uniq_site].category ] += 1
+
+	if writeout:
+		print '{0},{1}'.format("REGION", "# SITES")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True):
+			if ret[0]:
+				print '{0},{1}'.format(ret[0], ret[1])
+			else:
+				print '{0},{1}'.format("No region", ret[1])
+	print "{0},{1}".format("TOTAL:", sum(ret_dict.values()))
+	return ret_dict
+
+# overall most popular categories, by # of accounts
+def ov_most_popular_categories_accs(rset, cat_file, writeout=True):
+	ret_dict = defaultdict(int)
+	site_dict = _site_cat_dict(cat_file)
+	# proceed to read sites
+	for site in total_unique_results(rset, writeout=False)[0]:
+		# some sites have no region
+		if site_dict[site[0]]:
+			ret_dict[ site_dict[site[0]].category ] += 1
+	if writeout:
+		print '{0},{1}'.format("REGION", "# ACCOUNTS")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True):
+			if ret[0]:
+				print '{0},{1}'.format(ret[0], ret[1])
+			else:
+				print '{0},{1}'.format("No category", ret[1])
+	print "{0},{1}".format("TOTAL:", sum(ret_dict.values()))
+	return ret_dict
+
+# site's most popular categories, by # of accounts
+def site_most_popular_categories_accs(rset, cat_file, writeout=True):
+	ret_dict = defaultdict(Counter)
+	site_dict = _site_cat_dict(cat_file)
+	no_dups = total_site_results_nodup(rset, writeout=False)[0]
+	# proceed to read sites
+	for pw_site in no_dups:
+		for site in no_dups[pw_site]:
+			# some sites have no region
+			if site_dict[site[0]]:
+				# double layer dictionary
+				(ret_dict[pw_site])[site_dict[site[0]].category] += 1
+	if writeout:
+		print '{0},{1}'.format("REGION", "# ACCOUNTS")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True):
+			print ret[0]
+			for r in sorted(ret[1].items(), key=lambda y : y[1],\
+			 reverse=True):
+				if r[0]:
+					print '{0},{1}'.format(r[0], r[1])
+				else:
+					print '{0},{1}'.format("No region", r[1])
+			print
+	return ret_dict
+
+# site's most popular countries, by # of accounts
+def site_most_popular_categories_sites(rset, cat_file, writeout=True):
+	ret_dict = defaultdict(Counter)
+	site_dict = _site_cat_dict(cat_file)
+	uniq_sites = defaultdict(set)
+	# get unique sites scraped
+	sav_dict = total_site_results_nodup(rset, writeout=False)[0]
+	# for each password site (key for dictionary)
+	for uniq_dict in sav_dict:
+		# for each result site for that site
+		for dict_site in sav_dict[uniq_dict]:
+			# add it to a set
+			uniq_sites[uniq_dict].add(dict_site[0])
+	# proceed to read sites
+	for pw_site in uniq_sites:
+		for site in uniq_sites[pw_site]:
+			# some sites have no region
+			if site_dict[site]:
+				# double layer dictionary
+				(ret_dict[pw_site])[site_dict[site].category] += 1
+	if writeout:
+		print '{0},{1}'.format("REGION", "# SITES")
+		for ret in sorted(ret_dict.items(), key=lambda x : x[1],\
+		 reverse=True):
+			print ret[0]
+			for r in sorted(ret[1].items(), key=lambda y : y[1],\
+			 reverse=True):
+				if r[0]:
+					print '{0},{1}'.format(r[0], r[1])
+				else:
+					print '{0},{1}'.format("No region", r[1])
+			print
+	return ret_dict
