@@ -1,5 +1,5 @@
 """ Metrics common to each site """
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 def common_name(site):
 	if 'bmn' in site:
@@ -269,7 +269,6 @@ def non_formed_accounts(rset, writeout=True):
 		 reverse=True):
 			print '{0},{1}'.format(ret[0], ret[1])
 	return ret_dict
-
 
 # Helper class for site categorization metrics
 class site_category:

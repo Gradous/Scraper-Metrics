@@ -272,7 +272,6 @@ def non_formed_accounts(rset, writeout=True):
 			print '{0: <17} {1}'.format(ret[0], ret[1])
 	return ret_dict
 
-
 # Helper class for site categorization metrics
 class site_category:
 	def __init__(self, csv):
@@ -502,3 +501,42 @@ def site_most_popular_categories_sites(rset, cat_file, writeout=True):
 					print '{0: <17} {1}'.format("No region", r[1])
 			print
 	return ret_dict
+
+def _table_print(bmn, fa, lgz, l2m, pwd7):
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format(" ", "BMN", "FA", "LGZ", "L2M", "PWD7")
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format("BMN", "-", len(bmn & fa), len(bmn & lgz),\
+	 len(bmn & l2m), len(bmn & pwd7))
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format("FA", len(fa & bmn), "-", len(fa & lgz),\
+	 len(fa & l2m), len(fa & pwd7))
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format("LGZ", len(lgz & bmn), len(lgz & fa), "-", \
+	 len(lgz & l2m), len(lgz & pwd7))
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format("L2M", len(l2m & bmn), len(l2m & fa), len(l2m & lgz), \
+	 "-", len(l2m & pwd7))
+	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
+	.format("PWD7", len(pwd7 & bmn), len(pwd7 & fa), len(pwd7 & lgz), \
+	 len(pwd7 & l2m), "-")
+
+# 
+def site_to_site_share(rset, writeout=True):
+	bmn, fa, lgz, l2m, pwd7 = set(), set(), set(), set(), set()
+	uniq_sites = total_site_results_nodup(rset, writeout=False)[0]
+	for result in uniq_sites:
+		for site in uniq_sites[result]:
+			if result == "BugMeNot":
+				bmn.add((site[0], site[1], site[2]))
+			elif result == "FakeAccount":
+				fa.add((site[0], site[1], site[2]))
+			elif result == "Loginz":
+				lgz.add((site[0], site[1], site[2]))
+			elif result == "Login2Me":
+				l2m.add((site[0], site[1], site[2]))
+			elif result == "Password7":
+				pwd7.add((site[0], site[1], site[2]))
+	if writeout:
+		_table_print(bmn, fa, lgz, l2m, pwd7)
+	return (bmn, fa, lgz, l2m, pwd7)
