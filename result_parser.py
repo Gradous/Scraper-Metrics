@@ -1,6 +1,5 @@
 import os
 import argparse
-import hr_netsec_metrics as metrics
 from collections import defaultdict
 
 def parse_args():
@@ -15,6 +14,9 @@ def parse_args():
 	 default=None, help='Categories CSV file', type=str)
 	parser.add_argument('--alexa', metavar='alexa',\
 	 default=None, help='Alexa top 1000 CSV file', type=str)
+	parser.add_argument('--format', metavar='format',\
+	choices=['hr', 'csv'],
+	 default='hr', help='Output format', type=str)
 	return parser.parse_args()
 
 # Parse out which files we want
@@ -39,48 +41,50 @@ def get_result_set(directory, site):
 	# { password sharing site file : [list of credentials] }
 	return rsets
 
-def main(directory, site, categories_csv=None, alexa_csv=None):
+def main(directory, site, output_fmt, categories_csv=None, alexa_csv=None):
+	if output_fmt == "hr":
+		import hr_netsec_metrics as metrics
+	else:
+		import netsec_metrics as metrics
 	rsets = get_result_set(directory, site)
 	print "##### Total per site #####"
-	#metrics.total_results(rsets)
+	metrics.total_results(rsets)
 	print "##### Total unique results per site #####"
-	#metrics.total_site_results_nodup(rsets)[0]
+	metrics.total_site_results_nodup(rsets)[0]
 	print "##### Total unique accounts #####"
-	#metrics.total_unique_results(rsets)[0]
+	metrics.total_unique_results(rsets)[0]
 	print "##### Most popular sites #####"
-	#metrics.most_popular_sites(rsets, limit=10)
+	metrics.most_popular_sites(rsets, limit=10)
 	print "##### Alexa results by site #####"
-	#metrics.alexa_results_by_site(rsets, alexa_csv)
+	metrics.alexa_results_by_site(rsets, alexa_csv)
 	print "##### Accounts with profanity #####"
-	#metrics.profane_accounts(rsets)
+	metrics.profane_accounts(rsets)
 	print "##### Change over time #####"
-	#metrics.change_over_time(rsets)
+	metrics.change_over_time(rsets)
 	print "##### Most voted on sites #####"
-	#metrics.most_voted_sites(rsets)
-	#print "##### Highest vote to success percentage ratio #####"
-	#metrics.highest_vote_perc_ratio(rsets)
+	metrics.most_voted_sites(rsets)
 	print "##### Non-formed accounts #####"
-	#metrics.non_formed_accounts(rsets)
+	metrics.non_formed_accounts(rsets)
 	print "##### Site to site sharing #####"
 	metrics.site_to_site_share(rsets)
 	if categories_csv:
 		print "##### Popular sites (countries, overall, by # sites) #####"
-		#metrics.ov_most_popular_countries_sites(rsets, categories_csv)
+		metrics.ov_most_popular_countries_sites(rsets, categories_csv)
 		print "##### Popular sites (countries, overall, by # accounts) #####"
-		#metrics.ov_most_popular_countries_accs(rsets, categories_csv)
+		metrics.ov_most_popular_countries_accs(rsets, categories_csv)
 		print "##### Popular sites (countries, per site, by # sites) #####"
-		#metrics.site_most_popular_countries_sites(rsets, categories_csv)
+		metrics.site_most_popular_countries_sites(rsets, categories_csv)
 		print "##### Popular sites (countries, per site, by # accounts) #####"
-		#metrics.site_most_popular_countries_accs(rsets, categories_csv)
+		metrics.site_most_popular_countries_accs(rsets, categories_csv)
 		print "##### Popular sites (categories, overall, by # sites) #####"
-		#metrics.ov_most_popular_categories_sites(rsets, categories_csv)
+		metrics.ov_most_popular_categories_sites(rsets, categories_csv)
 		print "##### Popular sites (categories, overall, by # accounts) #####"
-		#metrics.ov_most_popular_categories_accs(rsets, categories_csv)
+		metrics.ov_most_popular_categories_accs(rsets, categories_csv)
 		print "##### Popular sites (categories, per site, by # sites) #####"
-		#metrics.site_most_popular_categories_accs(rsets, categories_csv)
+		metrics.site_most_popular_categories_sites(rsets, categories_csv)
 		print "##### Popular sites (categories, per site, by # accounts) #####"
-		#metrics.site_most_popular_categories_accs(rsets, categories_csv)
+		metrics.site_most_popular_categories_accs(rsets, categories_csv)
 
 if __name__ == '__main__':
 	args = parse_args()
-	main(args.directory, args.site, args.categories, args.alexa)
+	main(args.directory, args.site, args.format, args.categories, args.alexa)

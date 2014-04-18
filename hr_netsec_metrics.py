@@ -171,8 +171,10 @@ def most_voted_sites(rset, writeout=True, limit=10):
 	ret_dict = defaultdict(int)
 	perc_dict = defaultdict(int)
 	for result in rset.items():
-		if not "login2me" in result[0] and \
-		not "loginz" in result[0]:
+		# want BMN only
+		if "bmn" in result[0]:
+		#if not "login2me" in result[0] and \
+		#not "loginz" in result[0]:
 			for r in result[1]:
 				if "bmn" in result[0]:
 					vote_str = r[-2]
@@ -502,6 +504,7 @@ def site_most_popular_categories_sites(rset, cat_file, writeout=True):
 			print
 	return ret_dict
 
+# Helper function for nice output
 def _table_print(bmn, fa, lgz, l2m, pwd7):
 	print "{0: <7}{1: <7}{2: <7}{3: <7}{4: <7}{5: <7}"\
 	.format(" ", "BMN", "FA", "LGZ", "L2M", "PWD7")
@@ -521,7 +524,7 @@ def _table_print(bmn, fa, lgz, l2m, pwd7):
 	.format("PWD7", len(pwd7 & bmn), len(pwd7 & fa), len(pwd7 & lgz), \
 	 len(pwd7 & l2m), "-")
 
-# 
+# number of accounts shared between individual sites
 def site_to_site_share(rset, writeout=True):
 	bmn, fa, lgz, l2m, pwd7 = set(), set(), set(), set(), set()
 	uniq_sites = total_site_results_nodup(rset, writeout=False)[0]
