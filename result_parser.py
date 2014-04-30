@@ -47,7 +47,8 @@ def main(directory, site, output_fmt, categories_csv=None, alexa_csv=None):
 	else:
 		import netsec_metrics as metrics
 	rsets = get_result_set(directory, site)
-	print "##### Total per site #####"
+	
+	print "##### Total lines scraped per site #####"
 	metrics.total_results(rsets)
 	print "##### Total unique results per site #####"
 	metrics.total_site_results_nodup(rsets)[0]
@@ -67,6 +68,8 @@ def main(directory, site, output_fmt, categories_csv=None, alexa_csv=None):
 	metrics.non_formed_accounts(rsets)
 	print "##### Site to site sharing #####"
 	metrics.site_to_site_share(rsets)
+	print "##### Popular results for each site #####"
+	metrics.pop_sites_by_site(rsets)
 	if categories_csv:
 		print "##### Popular sites (countries, overall, by # sites) #####"
 		metrics.ov_most_popular_countries_sites(rsets, categories_csv)

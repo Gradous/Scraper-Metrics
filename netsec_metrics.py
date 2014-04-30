@@ -541,3 +541,23 @@ def site_to_site_share(rset, writeout=True):
 	if writeout:
 		_table_print(bmn, fa, lgz, l2m, pwd7)
 	return (bmn, fa, lgz, l2m, pwd7)
+
+# most popular sites for each PW sharing site
+def pop_sites_by_site(rset, writeout=True, limit=20):
+	ret_dict = defaultdict(Counter)
+	# get unique sites scraped
+	sav_dict = total_site_results_nodup(rset, writeout=False)[0]
+	# for each password site (key for dictionary)
+	for pw_site in sav_dict:
+		# for each result site for that site
+		for site_result in sav_dict[pw_site]:
+			# add website to PW sharing site's counter
+			(ret_dict[pw_site])[site_result[0]] += 1
+	if writeout:
+		print '{0},{1}'.format("SITE", "RESULTS")
+		for pw_site in sorted(ret_dict.keys()):
+			print '{0}'.format(pw_site)
+			for ret in sorted(ret_dict[pw_site].items(), key=lambda x : x[1],\
+			 reverse=True)[:limit]:
+				print '{0},{1}'.format(ret[0], ret[1])
+			print
